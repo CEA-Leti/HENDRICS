@@ -1,0 +1,13 @@
+[Match]
+# Match interface name
+Name=end0    
+
+[Link]
+Name = eth0
+MACAddress=FF:EE:DD:CC:BB:AA
+
+[Network]
+# Static IPv4
+Address=192.168.0.12/24
+Gateway=192.168.0.1
+

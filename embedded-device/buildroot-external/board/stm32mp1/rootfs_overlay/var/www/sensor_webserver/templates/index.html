@@ -1,0 +1,76 @@
+<!--
+Copyright (C) 2025 CEA - All Rights Reserved
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Web site</title>
+	<script src="{{url_for('static', filename='socket.io.js')}}"></script>
+	<style>
+		/* <div> containing multiple inline elements */
+		.parent-div {
+		  display: inline-block; /* To display inline */
+		  border: 1px solid #ccc; /* Border for clarity */
+		  padding: 10px; /* Inner spacing */
+		}
+	
+		/* Style for child elements of the div */
+		.parent-div > * {
+		  display: inline-block;
+		  margin-right: 10px; /* Spacing between child elements */
+		}
+	</style>
+</head>
+
+<body>
+	<h1>SENSEHAT Data</h1>
+	<div>
+		<span>Temperature:</span>
+		<span id="temperature">0</span>
+		<span>Last Update:</span>
+		<span id="tTIMESTAMP">0</span>
+	</div>
+	<div>
+		<span>Pressure:</span>
+		<span id="pressure">0</span>
+		<span>Last Update:</span>
+		<span id="pTIMESTAMP">0</span>
+	</div>
+
+	<div>
+		<span>Humidity:</span>
+		<span id="humidity">0</span>
+		<span>Last Update:</span>
+		<span id="hTIMESTAMP">0</span>
+	</div>
+
+	<script>
+		// Change IP to match your webserver's IP
+		const socket = io.connect(window.location.href); 
+
+		// Listen for the message_to_all_clients event
+		socket.on('SENSE_DATA', (data) => {
+			// Update the page content with the received message
+			var msg = data.message;
+			document.getElementById(msg.split(' ')[0]).innerText = msg.split(' ')[1];
+			document.getElementById(Array.from(msg)[0] + "TIMESTAMP").innerText = msg.split(' ')[2] + ' ' + msg.split(' ')[3];
+		});
+	</script>
+
+</body>
+</html>

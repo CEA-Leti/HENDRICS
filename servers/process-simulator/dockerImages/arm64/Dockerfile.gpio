@@ -1,0 +1,47 @@
+# Copyright (C) 2025 CEA - All Rights Reserved
+# 
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>.
+
+FROM python:3.10-alpine
+
+# Define useful labels.
+LABEL version="2.0.1"
+LABEL maintainer="Maxime.Puys@cea.fr"
+LABEL vendor="IRT-PULSE"
+
+# Switch to root user.
+USER root
+
+# Install required packets.
+RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories  # FIXME remove when added to main alpine repo.
+RUN apk update && apk upgrade
+RUN apk add \
+    pigpio
+RUN pip3 install --upgrade pip
+
+# Include path to simulator in python's path.
+ENV PYTHONPATH "${PYTHONPATH}:/opt/process-simulator"
+
+# Install required python packages.
+COPY process-simulator/requirements.txt /opt/process-simulator/
+RUN cd /opt/process-simulator && pip3 install -r requirements.txt
+RUN pip3 install pigpio
+
+COPY process-simulator/protocols/gpio.py /opt/process-simulator/protocols/gpio.py
+COPY process-simulator/scenarios /opt/process-simulator/scenarios
+
+ARG REDIS_HOST="redis"
+LABEL restHost=$REDIS_HOST
+ENV REDIS_HOST $REDIS_HOST
+
+ENTRYPOINT ["python3", "/opt/process-simulator/protocols/gpio.py"]

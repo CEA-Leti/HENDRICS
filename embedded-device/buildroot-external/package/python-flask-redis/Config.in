@@ -1,0 +1,8 @@
+menu "python-flask-redis"  
+
+config BR2_PACKAGE_PYTHON_FLASK_REDIS
+	bool "python-flask-redis"
+	help
+	  A nice way to use Redis in your Flask app.
+endmenu
+

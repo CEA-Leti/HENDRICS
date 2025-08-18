@@ -1,0 +1,9 @@
+[Unit]
+Description=Sense Hat service
+
+[Service]
+ExecStart=
+ExecStart=/bin/bash /etc/sensehat.sh
+
+[Install]
+WantedBy=default.target

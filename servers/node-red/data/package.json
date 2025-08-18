@@ -1,0 +1,13 @@
+{
+    "name": "node-red-project",
+    "description": "A Node-RED Project",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "@flowforge/node-red-dashboard": "~0.6.1",
+        "node-red-contrib-influxdb": "~0.6.1",
+        "node-red-contrib-python-function": "~0.0.5",
+        "node-red-contrib-ui_j": "~1.2.19",
+        "node-red-dashboard": "~3.6.0"
+    }
+}

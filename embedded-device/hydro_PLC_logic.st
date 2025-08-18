@@ -1,0 +1,854 @@
+(* Copyright (C) 2025 CEA - All Rights Reserved *)
+(*  *)
+(* This program is free software: you can redistribute it and/or modify it under *)
+(* the terms of the GNU General Public License as published by the Free Software *)
+(* Foundation, either version 3 of the License, or (at your option) any later *)
+(* version. *)
+(*  *)
+(* This program is distributed in the hope that it will be useful, but WITHOUT ANY *)
+(* WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR *)
+(* A PARTICULAR PURPOSE. See the GNU General Public License for more details. *)
+(*  *)
+(* You should have received a copy of the GNU General Public License along with *)
+(* this program.  If not, see <http://www.gnu.org/licenses/>. *)
+
+FUNCTION_BLOCK Regulation_barrage
+  VAR_EXTERNAL
+    HYDRO_ST_TURB : INT;
+    HYDRO_VT_ALTERN : INT;
+    HYDRO_FQT_ALTERN : INT;
+    HYDRO_FT_VA_TETE : INT;
+    HYDRO_JT_ALTERN : INT;
+    HYDRO_FSP_EAU : INT;
+    HYDRO_VSP_ALTERN : INT;
+    HYD_ZT_VA_RGN : INT;
+    HYDRO_ZSO_VA_TETE : BOOL;
+    HYDRO_ZSC_VA_TETE : BOOL;
+    HYDRO_ZSO_VA_PIED : BOOL;
+    HYDRO_ZSC_VA_PIED : BOOL;
+    HYDRO_CMDO_VA_TETE : BOOL;
+    HYDRO_CMDC_VA_TETE : BOOL;
+    HYDRO_CMDO_VA_PIED : BOOL;
+    HYDRO_CMDC_VA_PIED : BOOL;
+    BP_CMDO_DISJ : BOOL;
+    HYDRO_AUTORIZ_CPL : BOOL;
+    HYDRO_DEF_DE : BOOL;
+    HYDRO_DEF_DB : BOOL;
+    HYDRO_DEF_DH : BOOL;
+    HYDRO_DEF_DVT : BOOL;
+    HYDRO_CMD_COUPLAGE : BOOL;
+  END_VAR
+  VAR
+    VAR_M580S : BOOL;
+  END_VAR
+  VAR_EXTERNAL
+    HYDRO_ZSO_VA_BARRAGE : BOOL;
+    HYDRO_ZSC_VA_BARRAGE : BOOL;
+    HYDRO_CMDC_VA_BARRAGE : BOOL;
+    HYDRO_CMDO_VA_BARRAGE : BOOL;
+    HYDRO_ZT_VA_BARRAGE : INT;
+    HYDRO_LT_EAU_BARRAGE : INT;
+    HYDRO_FT_IN_BARRAGE : INT;
+    HYDRO_FT_VA_BARRAGE : INT;
+  END_VAR
+  VAR_OUTPUT
+    Regulation_valide : BOOL;
+  END_VAR
+
+  INITIAL_STEP Step1:
+  END_STEP
+
+  TRANSITION FROM Step1 TO Step2
+    := (HYDRO_LT_EAU_BARRAGE >= 8);
+  END_TRANSITION
+
+  STEP Step2:
+    HYDRO_CMDO_VA_BARRAGE(N);
+  END_STEP
+
+  TRANSITION FROM Step2 TO Step3
+    := (HYDRO_ZT_VA_BARRAGE = 100) AND HYDRO_ZSO_VA_BARRAGE;
+  END_TRANSITION
+
+  STEP Step3:
+  END_STEP
+
+  TRANSITION FROM Step3 TO Step1
+    := (HYDRO_LT_EAU_BARRAGE <= 5) AND HYDRO_ZSO_VA_BARRAGE ;
+  END_TRANSITION
+
+  TRANSITION FROM Step1 TO Step4
+    := (HYDRO_LT_EAU_BARRAGE <= 5);
+  END_TRANSITION
+
+  STEP Step4:
+    HYDRO_CMDC_VA_BARRAGE(N);
+  END_STEP
+
+  TRANSITION FROM Step4 TO Step5
+    := (HYDRO_ZT_VA_BARRAGE = 0) AND HYDRO_ZSC_VA_BARRAGE ;
+  END_TRANSITION
+
+  STEP Step5:
+  END_STEP
+
+  TRANSITION FROM Step5 TO Step1
+    := (HYDRO_LT_EAU_BARRAGE >= 8) AND HYDRO_ZSC_VA_BARRAGE;
+  END_TRANSITION
+
+  INITIAL_STEP Step6:
+  END_STEP
+
+  TRANSITION FROM Step6 TO Step7
+    := (HYDRO_LT_EAU_BARRAGE < 9)  AND (HYDRO_LT_EAU_BARRAGE > 4);
+  END_TRANSITION
+
+  STEP Step7:
+    Regulation_valide(N);
+  END_STEP
+
+  TRANSITION FROM Step7 TO Step6
+    := NOT ((HYDRO_LT_EAU_BARRAGE < 9)  AND (HYDRO_LT_EAU_BARRAGE > 4));
+  END_TRANSITION
+
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK Regulation_huile
+  VAR_EXTERNAL
+    HYDRO_TT_HUILE : INT;
+    HYDRO_ST_PO_EAU : INT;
+    HYDRO_FT_EAU_REFR : INT;
+    HYDRO_TT_EAU : INT;
+    HYDRO_TT_ECHAUFF : INT;
+    HYDRO_TT_EAU_REFR : INT;
+    HYDRO_SSP_PO_EAU : INT;
+    HYDRO_RM_PO_HUILE : BOOL;
+    HYDRO_RM_PO_EAU : BOOL;
+    HYDRO_CMD_PO_HUILE : BOOL;
+    HYDRO_CMD_PO_EAU : BOOL;
+  END_VAR
+  VAR_OUTPUT
+    Temperature_huile_valide : BOOL;
+  END_VAR
+  VAR_INPUT
+    Lancement : BOOL;
+  END_VAR
+
+  INITIAL_STEP Step0:
+    HYDRO_CMD_PO_HUILE(R);
+  END_STEP
+
+  TRANSITION FROM Step0 TO Step1
+    := Lancement;
+  END_TRANSITION
+
+  STEP Step1:
+    Gestion_Huile(N);
+  END_STEP
+
+  ACTION Gestion_Huile:
+    (*J'ai fais cette action en code ST car en SFC le runtime fesait comme il voulait*)
+    IF HYDRO_TT_HUILE = 70 THEN
+      HYDRO_CMD_PO_HUILE := 0;
+      IF HYDRO_RM_PO_HUILE = 1 THEN (*Vérification de l'ouverture*)
+         HYDRO_CMD_PO_HUILE := 0;
+      END_IF;
+    ELSE
+      HYDRO_CMD_PO_HUILE := 1;
+      IF HYDRO_RM_PO_HUILE = 0 THEN(*Vérification de la fermeture*)
+
+         HYDRO_CMD_PO_HUILE := 1;
+
+      END_IF;
+    END_IF;
+
+    IF HYDRO_TT_HUILE > 60 THEN
+      Temperature_huile_valide := 1 ;
+    END_IF;
+  END_ACTION
+
+  TRANSITION FROM Step1 TO Step0
+    := NOT Lancement;
+  END_TRANSITION
+
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK Regulation_pompe_eau
+  VAR_EXTERNAL
+    HYDRO_TT_HUILE : INT;
+    HYDRO_ST_PO_EAU : INT;
+    HYDRO_FT_EAU_REFR : INT;
+    HYDRO_TT_EAU : INT;
+    HYDRO_TT_ECHAUFF : INT;
+    HYDRO_TT_EAU_REFR : INT;
+    HYDRO_SSP_PO_EAU : INT;
+    HYDRO_RM_PO_HUILE : BOOL;
+    HYDRO_RM_PO_EAU : BOOL;
+    HYDRO_CMD_PO_HUILE : BOOL;
+    HYDRO_CMD_PO_EAU : BOOL;
+  END_VAR
+  VAR_OUTPUT
+    Pompe_eau_valide : BOOL;
+  END_VAR
+  VAR_INPUT
+    Lancement : BOOL;
+  END_VAR
+
+  INITIAL_STEP Step1:
+  END_STEP
+
+  TRANSITION FROM Step1 TO Step2
+    := Lancement;
+  END_TRANSITION
+
+  STEP Step2:
+    Incrementation_pompe_eau(N);
+  END_STEP
+
+  ACTION Incrementation_pompe_eau:
+    (*L'objectif est de stabiliser la température à 60°, cela se fait lors que la consigne atteint 1356*)
+    (*Ce code permet de rendre la simulation réaliste *)
+    HYDRO_CMD_PO_EAU := 1;
+    IF HYDRO_CMD_PO_EAU = 1 THEN
+      IF HYDRO_SSP_PO_EAU >= 1300 THEN
+        IF HYDRO_SSP_PO_EAU < 1356 THEN
+          HYDRO_SSP_PO_EAU := HYDRO_SSP_PO_EAU + 1; (* La stabilisation se fera en plusieurs cycles  pour avoir un rendu réaliste.*)
+        ELSE
+          HYDRO_SSP_PO_EAU := HYDRO_SSP_PO_EAU - 2; (* Faire varié la valeur stabilisé comme si il y a vait un correcteur.*)
+        END_IF;
+      ELSE  
+        HYDRO_SSP_PO_EAU := HYDRO_SSP_PO_EAU  + 150; (*Pour atteindre 1375 en 9 cycles*)
+      END_IF;
+    ELSE 
+      HYDRO_CMD_PO_EAU := 1;
+    END_IF;
+
+    IF HYDRO_RM_PO_EAU THEN
+      Pompe_eau_valide := 1 ; 
+    END_IF;
+      
+  END_ACTION
+
+  TRANSITION FROM Step2 TO Step1
+    := NOT Lancement;
+  END_TRANSITION
+
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK Production
+  VAR_EXTERNAL
+    HYDRO_ST_TURB : INT;
+    HYDRO_FQT_ALTERN : INT;
+    HYDRO_VT_ALTERN : INT;
+    HYDRO_FT_VA_TETE : INT;
+    HYDRO_JT_ALTERN : INT;
+    HYD_ZT_VA_RGN : INT;
+    HYDRO_VSP_ALTERN : INT;
+    HYDRO_ZSO_VA_TETE : BOOL;
+    HYDRO_ZSC_VA_TETE : BOOL;
+    HYDRO_ZSO_VA_PIED : BOOL;
+    HYDRO_ZSC_VA_PIED : BOOL;
+    HYDRO_CMDO_VA_TETE : BOOL;
+    HYDRO_CMDC_VA_TETE : BOOL;
+    HYDRO_CMDO_VA_PIED : BOOL;
+    HYDRO_CMDC_VA_PIED : BOOL;
+    HYDRO_CMD_COUPLAGE : BOOL;
+    HYDRO_AUTORIZ_CPL : BOOL;
+    HYDRO_SIM_DISJ : BOOL;
+    BP_ENABLE_Production : BOOL;
+    IHM_Consigne_Puissance : INT;
+  END_VAR
+  VAR
+    Tempo : BOOL;
+  END_VAR
+  VAR_INPUT
+    Lancement : BOOL;
+  END_VAR
+
+  INITIAL_STEP Step0:
+  END_STEP
+
+  TRANSITION FROM Step0 TO Step1
+    := Lancement;
+  END_TRANSITION
+
+  STEP Step1:
+  END_STEP
+
+  TRANSITION FROM Step1 TO Step2
+    := NOT BP_ENABLE_Production OR NOT  Lancement;
+  END_TRANSITION
+
+  STEP Step2:
+    ALTERN_consigne_0(N);
+  END_STEP
+
+  ACTION ALTERN_consigne_0:
+    HYDRO_VSP_ALTERN := 0;
+  END_ACTION
+
+  TRANSITION FROM Step2 TO Step3
+    := (HYDRO_VSP_ALTERN = 0);
+  END_TRANSITION
+
+  STEP Step3:
+    RGN_tends_vers_0(N);
+  END_STEP
+
+  ACTION RGN_tends_vers_0:
+    IF HYD_ZT_VA_RGN > 0 THEN
+      HYD_ZT_VA_RGN := HYD_ZT_VA_RGN -1;
+    END_IF;
+  END_ACTION
+
+  TRANSITION FROM Step3 TO Step4
+    := HYD_ZT_VA_RGN = 0;
+  END_TRANSITION
+
+  STEP Step4:
+    HYDRO_CMDC_VA_PIED(N);
+    HYDRO_CMDC_VA_TETE(N);
+  END_STEP
+
+  TRANSITION FROM Step4 TO Step5
+    := ((HYDRO_ZSO_VA_TETE = 0) AND (HYDRO_ZSC_VA_TETE = 1)) AND ((HYDRO_ZSO_VA_PIED = 0) AND (HYDRO_ZSC_VA_PIED = 1)) ;
+  END_TRANSITION
+
+  STEP Step5:
+  END_STEP
+
+  TRANSITION FROM Step5 TO Step0
+    :=  BP_ENABLE_Production ;
+  END_TRANSITION
+
+  TRANSITION FROM Step3 TO Step6
+    := (HYD_ZT_VA_RGN >  0) AND (HYD_ZT_VA_RGN < 10) ;
+  END_TRANSITION
+
+  STEP Step6:
+    Tempo(D, T#1s);
+  END_STEP
+
+  TRANSITION FROM Step6 TO Step3
+    := Tempo;
+  END_TRANSITION
+
+  TRANSITION FROM Step3 TO Step7
+    := HYD_ZT_VA_RGN >10;
+  END_TRANSITION
+
+  STEP Step7:
+    Tempo(D, T#0.25s);
+  END_STEP
+
+  TRANSITION FROM Step7 TO Step3
+    := Tempo;
+  END_TRANSITION
+
+  TRANSITION FROM Step1 TO Step8
+    := BP_ENABLE_Production;
+  END_TRANSITION
+
+  STEP Step8:
+  END_STEP
+
+  TRANSITION FROM Step8 TO Step9
+    := 1;
+  END_TRANSITION
+
+  STEP Step9:
+    HYDRO_CMDO_VA_TETE(N);
+  END_STEP
+
+  TRANSITION FROM Step9 TO Step10
+    := (HYDRO_ZSO_VA_TETE = 1) AND (HYDRO_ZSC_VA_TETE = 0);
+  END_TRANSITION
+
+  STEP Step10:
+    HYDRO_CMDO_VA_PIED(N);
+  END_STEP
+
+  TRANSITION FROM Step10 TO Step11
+    := (HYDRO_ZSO_VA_PIED = 1) AND (HYDRO_ZSC_VA_PIED = 0);
+  END_TRANSITION
+
+  STEP Step11:
+    RGN_Incremenation(N);
+  END_STEP
+
+  ACTION RGN_Incremenation:
+    HYD_ZT_VA_RGN := HYD_ZT_VA_RGN +1 ;
+  END_ACTION
+
+  TRANSITION FROM Step11 TO Step12
+    := 1;
+  END_TRANSITION
+
+  STEP Step12:
+    Tempo(D, T#1s);
+  END_STEP
+
+  TRANSITION FROM Step12 TO Step13
+    := Tempo;
+  END_TRANSITION
+
+  STEP Step13:
+  END_STEP
+
+  TRANSITION FROM Step13 TO Step11
+    := (HYDRO_ST_TURB <1500) AND BP_ENABLE_Production AND Lancement;
+  END_TRANSITION
+
+  TRANSITION FROM Step13 TO Step14
+    := (HYDRO_ST_TURB = 1500) AND BP_ENABLE_Production AND Lancement;
+  END_TRANSITION
+
+  STEP Step14:
+    ALTERN_consigne_100(N);
+  END_STEP
+
+  ACTION ALTERN_consigne_100:
+    HYDRO_VSP_ALTERN := 100;
+  END_ACTION
+
+  TRANSITION FROM Step14 TO Step15
+    := HYDRO_VT_ALTERN = 100;
+  END_TRANSITION
+
+  STEP Step15:
+    Tempo(D, T#1s);
+  END_STEP
+
+  TRANSITION FROM Step15 TO Step16
+    := Tempo;
+  END_TRANSITION
+
+  STEP Step16:
+  END_STEP
+
+  TRANSITION FROM Step16 TO Step2
+    := NOT BP_ENABLE_Production OR NOT Lancement;
+  END_TRANSITION
+
+  TRANSITION FROM Step16 TO Step17
+    := (HYDRO_JT_ALTERN < IHM_Consigne_Puissance) AND BP_ENABLE_Production AND Lancement;
+  END_TRANSITION
+
+  STEP Step17:
+    RGN_Incremenation(N);
+  END_STEP
+
+  TRANSITION FROM Step17 TO Step14
+    := 1;
+  END_TRANSITION
+
+  TRANSITION FROM Step16 TO Step18
+    := (HYDRO_JT_ALTERN > IHM_Consigne_Puissance) AND BP_ENABLE_Production AND Lancement;
+  END_TRANSITION
+
+  STEP Step18:
+    RGN_Desincrementation(N);
+  END_STEP
+
+  ACTION RGN_Desincrementation:
+    HYD_ZT_VA_RGN := HYD_ZT_VA_RGN -1 ;
+  END_ACTION
+
+  TRANSITION FROM Step18 TO Step14
+    := 1;
+  END_TRANSITION
+
+  TRANSITION FROM Step13 TO Step2
+    := NOT BP_ENABLE_Production OR NOT Lancement;
+  END_TRANSITION
+
+END_FUNCTION_BLOCK
+
+PROGRAM hydro
+  VAR_EXTERNAL
+    HYDRO_SIM_DISJ : BOOL;
+    BP_CMDO_DISJ : BOOL;
+    SEPAM : BOOL;
+    HYDRO_FREQ : INT;
+    HYDRO_COURANT1 : INT;
+    HYDRO_COURANT2 : INT;
+    HYDRO_COURANT3 : INT;
+  END_VAR
+  VAR
+    Regulation_barrage0 : Regulation_barrage;
+    Regulation_huile0 : Regulation_huile;
+    Regulation_pompe_eau0 : Regulation_pompe_eau;
+    Production0 : Production;
+    F_TRIG0 : F_TRIG;
+    R_TRIG0 : R_TRIG;
+    RS0 : RS;
+    SR0 : SR;
+    _TMP_GT14_OUT : BOOL;
+    _TMP_GT16_OUT : BOOL;
+    _TMP_GT18_OUT : BOOL;
+    _TMP_OR21_OUT : BOOL;
+    _TMP_OR25_OUT : BOOL;
+    _TMP_AND6_OUT : BOOL;
+    _TMP_NOT8_OUT : BOOL;
+    _TMP_AND9_OUT : BOOL;
+  END_VAR
+
+  _TMP_GT14_OUT := GT(HYDRO_COURANT1, 300);
+  _TMP_GT16_OUT := GT(HYDRO_COURANT2, 300);
+  _TMP_GT18_OUT := GT(HYDRO_COURANT3, 300);
+  _TMP_OR21_OUT := OR(_TMP_GT14_OUT, _TMP_GT16_OUT, _TMP_GT18_OUT);
+  F_TRIG0(CLK := BP_CMDO_DISJ);
+  RS0(S := _TMP_OR21_OUT, R1 := F_TRIG0.Q);
+  R_TRIG0(CLK := BP_CMDO_DISJ);
+  SR0(S1 := R_TRIG0.Q, R := F_TRIG0.Q);
+  _TMP_OR25_OUT := OR(RS0.Q1, SR0.Q1);
+  HYDRO_SIM_DISJ := _TMP_OR25_OUT;
+  Regulation_barrage0();
+  Regulation_huile0(Lancement := Regulation_barrage0.Regulation_valide);
+  Regulation_pompe_eau0(Lancement := Regulation_barrage0.Regulation_valide);
+  _TMP_AND6_OUT := AND(Regulation_huile0.Temperature_huile_valide, Regulation_pompe_eau0.Pompe_eau_valide);
+  _TMP_NOT8_OUT := NOT(HYDRO_SIM_DISJ);
+  _TMP_AND9_OUT := AND(_TMP_AND6_OUT, _TMP_NOT8_OUT);
+  Production0(Lancement := _TMP_AND9_OUT);
+END_PROGRAM
+
+PROGRAM Transfert_variable_hydro
+  VAR
+    M580S_var : BOOL;
+  END_VAR
+  VAR_EXTERNAL
+    HYDRO_CMDO_VA_BARRAGE : BOOL;
+    HYDRO_CMDC_VA_BARRAGE : BOOL;
+    HYDRO_ZSO_VA_BARRAGE : BOOL;
+    HYDRO_ZSC_VA_BARRAGE : BOOL;
+    HYDRO_ZT_VA_BARRAGE : INT;
+    HYDRO_LT_EAU_BARRAGE : INT;
+    HYDRO_FT_IN_BARRAGE : INT;
+    HYDRO_FT_VA_BARRAGE : INT;
+  END_VAR
+  VAR
+    M580_var : BOOL;
+  END_VAR
+  VAR_EXTERNAL
+    HYDRO_ST_TURB : INT;
+    HYDRO_VT_ALTERN : INT;
+    HYDRO_FQT_ALTERN : INT;
+    HYDRO_FT_VA_TETE : INT;
+    HYDRO_JT_ALTERN : INT;
+    HYDRO_FSP_EAU : INT;
+    HYDRO_VSP_ALTERN : INT;
+    HYD_ZT_VA_RGN : INT;
+    HYDRO_ZSO_VA_TETE : BOOL;
+    HYDRO_ZSC_VA_TETE : BOOL;
+    HYDRO_ZSO_VA_PIED : BOOL;
+    HYDRO_ZSC_VA_PIED : BOOL;
+    HYDRO_CMDO_VA_TETE : BOOL;
+    HYDRO_CMDC_VA_TETE : BOOL;
+    HYDRO_CMDO_VA_PIED : BOOL;
+    HYDRO_CMDC_VA_PIED : BOOL;
+    BP_CMDO_DISJ : BOOL;
+    HYDRO_AUTORIZ_CPL : BOOL;
+    HYDRO_DEF_DE : BOOL;
+    HYDRO_DEF_DB : BOOL;
+    HYDRO_DEF_DH : BOOL;
+    HYDRO_DEF_DVT : BOOL;
+    HYDRO_CMD_COUPLAGE : BOOL;
+    HYDRO_SIM_DISJ : BOOL;
+  END_VAR
+  VAR
+    M340 : BOOL;
+  END_VAR
+  VAR_EXTERNAL
+    HYDRO_TT_HUILE : INT;
+    HYDRO_ST_PO_EAU : INT;
+    HYDRO_FT_EAU_REFR : INT;
+    HYDRO_TT_EAU : INT;
+    HYDRO_TT_ECHAUFF : INT;
+    HYDRO_TT_EAU_REFR : INT;
+    HYDRO_SSP_PO_EAU : INT;
+    HYDRO_RM_PO_HUILE : BOOL;
+    HYDRO_RM_PO_EAU : BOOL;
+    HYDRO_CMD_PO_HUILE : BOOL;
+    HYDRO_CMD_PO_EAU : BOOL;
+    SEPAM : BOOL;
+    HYDRO_FREQ : INT;
+    HYDRO_COURANT1 : INT;
+    HYDRO_COURANT2 : INT;
+    HYDRO_COURANT3 : INT;
+  END_VAR
+  VAR
+    IHM_vars : BOOL;
+    M580s_vars : BOOL;
+  END_VAR
+  VAR
+    IHM_HYDRO_CMDO_VA_BARRAGE AT %QX10.0 : BOOL;
+    IHM_HYDRO_CMDC_VA_BARRAGE AT %QX10.1 : BOOL;
+    IHM_HYDRO_ZSO_VA_BARRAGE AT %QX10.2 : BOOL;
+    IHM_HYDRO_ZSC_VA_BARRAGE AT %QX10.3 : BOOL;
+    IHM_HYDRO_ZT_VA_BARRAGE AT %QW0 : INT;
+    IHM_HYDRO_LT_EAU_BARRAGE AT %QW1 : INT;
+    IHM_HYDRO_FT_IN_BARRAGE AT %QW2 : INT;
+    IHM_HYDRO_FT_VA_BARRAGE AT %QW3 : INT;
+  END_VAR
+  VAR
+    M580_vars : BOOL;
+  END_VAR
+  VAR
+    IHM_HYDRO_ST_TURB AT %QW11 : INT;
+    IHM_HYDRO_VT_ALTERN AT %QW12 : INT;
+    IHM_HYDRO_FQT_ALTERN AT %QW13 : INT;
+    IHM_HYDRO_FT_VA_TETE AT %QW14 : INT;
+    IHM_HYDRO_JT_ALTERN AT %QW15 : INT;
+    IHM_HYDRO_FSP_EAU AT %QW16 : INT;
+    IHM_HYDRO_VSP_ALTERN AT %QW17 : INT;
+    IHM_HYD_ZT_VA_RGN AT %QW18 : INT;
+    IHM_HYDRO_ZSO_VA_TETE AT %QX11.1 : BOOL;
+    IHM_HYDRO_ZSC_VA_TETE AT %QX11.2 : BOOL;
+    IHM_HYDRO_ZSO_VA_PIED AT %QX11.3 : BOOL;
+    IHM_HYDRO_ZSC_VA_PIED AT %QX11.4 : BOOL;
+    IHM_HYDRO_CMDO_VA_TETE AT %QX11.5 : BOOL;
+    IHM_HYDRO_CMDC_VA_TETE AT %QX11.6 : BOOL;
+    IHM_HYDRO_CMDO_VA_PIED AT %QX11.7 : BOOL;
+    IHM_HYDRO_CMDC_VA_PIED AT %QX12.0 : BOOL;
+    IHM_HYDRO_AUTORIZ_CPL AT %QX12.2 : BOOL;
+    IHM_HYDRO_DEF_DE AT %QX12.3 : BOOL;
+    IHM_HYDRO_DEF_DB AT %QX12.4 : BOOL;
+    IHM_HYDRO_DEF_DH AT %QX12.5 : BOOL;
+    IHM_HYDRO_DEF_DVT AT %QX12.6 : BOOL;
+    IHM_HYD_CMDC_CONT AT %QX12.7 : BOOL;
+    IHM_HYDRO_CMD_COUPLAGE AT %QX13.0 : BOOL;
+    IHM_HYDRO_SIM_DISJ AT %QX13.1 : BOOL;
+  END_VAR
+  VAR
+    M340_vars : BOOL;
+  END_VAR
+  VAR
+    IHM_HYDRO_ST_PO_EAU AT %QW4 : INT;
+    IHM_HYDRO_TT_HUILE AT %QW5 : INT;
+    IHM_HYDRO_FT_EAU_REFR AT %QW6 : INT;
+    IHM_HYDRO_TT_EAU AT %QW7 : INT;
+    IHM_HYDRO_TT_ECHAUFF AT %QW8 : INT;
+    IHM_HYDRO_TT_EAU_REFR AT %QW9 : INT;
+    IHM_HYDRO_SSP_PO_EAU AT %QW10 : INT;
+    IHM_HYDRO_RM_PO_HUILE AT %QX10.4 : BOOL;
+    IHM_HYDRO_RM_PO_EAU AT %QX10.5 : BOOL;
+    IHM_HYDRO_CMD_PO_HUILE AT %QX10.6 : BOOL;
+    IHM_HYDRO_CMD_PO_EAU AT %QX10.7 : BOOL;
+  END_VAR
+  VAR
+    SEPAM_vars : BOOL;
+  END_VAR
+  VAR
+    IHM_HYDRO_FREQ AT %QW20 : INT;
+    IHM_HYDRO_COURANT1 AT %QW21 : INT;
+    IHM_HYDRO_COURANT2 AT %QW22 : INT;
+    IHM_HYDRO_COURANT3 AT %QW23 : INT;
+  END_VAR
+
+  (*Ce programme a été réalisé car le   fonctionnel move est non fonctionnel en programme ladder.
+  Ce qui est problématique pour toute les natures de variable excepté le booléen*)
+
+  (**************************************************************
+
+  Regulation_Barrage : 
+
+  **************************************************************)
+
+  IHM_HYDRO_CMDO_VA_BARRAGE := HYDRO_CMDO_VA_BARRAGE ;
+  IHM_HYDRO_CMDC_VA_BARRAGE := HYDRO_CMDC_VA_BARRAGE ;
+
+  IHM_HYDRO_ZSO_VA_BARRAGE := HYDRO_ZSO_VA_BARRAGE ;
+  IHM_HYDRO_ZSC_VA_BARRAGE := HYDRO_ZSC_VA_BARRAGE ;
+
+  IHM_HYDRO_ZT_VA_BARRAGE := HYDRO_ZT_VA_BARRAGE ;
+  IHM_HYDRO_LT_EAU_BARRAGE := HYDRO_LT_EAU_BARRAGE ;
+
+  IHM_HYDRO_FT_IN_BARRAGE := HYDRO_FT_IN_BARRAGE ;
+  IHM_HYDRO_FT_VA_BARRAGE := HYDRO_FT_VA_BARRAGE ; 
+
+  (**************************************************************
+
+  M580 : 
+
+  **************************************************************)
+
+  IHM_HYDRO_ST_TURB := HYDRO_ST_TURB ;
+  IHM_HYDRO_VT_ALTERN := HYDRO_VT_ALTERN ;
+
+  IHM_HYDRO_FQT_ALTERN := HYDRO_FQT_ALTERN ;
+  IHM_HYDRO_FT_VA_TETE := HYDRO_FT_VA_TETE ;
+
+  IHM_HYDRO_JT_ALTERN := HYDRO_JT_ALTERN ;
+  IHM_HYDRO_FSP_EAU := HYDRO_FSP_EAU ;
+
+  IHM_HYDRO_VSP_ALTERN := HYDRO_VSP_ALTERN;
+  IHM_HYD_ZT_VA_RGN := HYD_ZT_VA_RGN ;
+
+  IHM_HYDRO_ZSO_VA_TETE := HYDRO_ZSO_VA_TETE ;
+  IHM_HYDRO_ZSC_VA_TETE := HYDRO_ZSC_VA_TETE ;
+
+  IHM_HYDRO_ZSO_VA_PIED := HYDRO_ZSO_VA_PIED ;
+  IHM_HYDRO_ZSC_VA_PIED := HYDRO_ZSC_VA_PIED ;
+
+  IHM_HYDRO_CMDO_VA_TETE := HYDRO_CMDO_VA_TETE ;
+  IHM_HYDRO_CMDC_VA_TETE := HYDRO_CMDC_VA_TETE ;
+
+  IHM_HYDRO_CMDO_VA_PIED := HYDRO_CMDO_VA_PIED ;
+  IHM_HYDRO_CMDC_VA_PIED := HYDRO_CMDC_VA_PIED ;
+
+
+  IHM_HYDRO_AUTORIZ_CPL := HYDRO_AUTORIZ_CPL ;
+
+  IHM_HYDRO_DEF_DE := HYDRO_DEF_DE ;
+  IHM_HYDRO_DEF_DB := HYDRO_DEF_DB ;
+  IHM_HYDRO_DEF_DH := HYDRO_DEF_DH ;
+  IHM_HYDRO_DEF_DVT := HYDRO_DEF_DVT ;
+
+  IHM_HYDRO_CMD_COUPLAGE := HYDRO_CMD_COUPLAGE ;
+
+  IHM_HYDRO_SIM_DISJ := HYDRO_SIM_DISJ ;
+   
+
+  (**************************************************************
+
+  M340 : 
+
+  **************************************************************)
+
+  IHM_HYDRO_TT_HUILE := HYDRO_TT_HUILE ;
+  IHM_HYDRO_ST_PO_EAU := HYDRO_ST_PO_EAU ;
+
+  IHM_HYDRO_FT_EAU_REFR := HYDRO_FT_EAU_REFR ;
+  IHM_HYDRO_TT_EAU := HYDRO_TT_EAU ;
+
+  IHM_HYDRO_TT_ECHAUFF := HYDRO_TT_ECHAUFF ;
+  IHM_HYDRO_TT_EAU_REFR := HYDRO_TT_EAU_REFR ;
+
+  IHM_HYDRO_SSP_PO_EAU := HYDRO_SSP_PO_EAU ;
+
+  IHM_HYDRO_RM_PO_HUILE := HYDRO_RM_PO_HUILE ;
+  IHM_HYDRO_RM_PO_EAU := HYDRO_RM_PO_EAU ;
+
+  IHM_HYDRO_CMD_PO_HUILE := HYDRO_CMD_PO_HUILE ;
+  IHM_HYDRO_CMD_PO_EAU := HYDRO_CMD_PO_EAU ;
+
+
+  (**************************************************************
+
+  SEPAM : 
+
+  **************************************************************)
+
+  IHM_HYDRO_FREQ := HYDRO_FREQ ;
+
+
+  IHM_HYDRO_COURANT1 := HYDRO_COURANT1 ;
+  IHM_HYDRO_COURANT2 := HYDRO_COURANT2 ;
+  IHM_HYDRO_COURANT3 := HYDRO_COURANT3 ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   
+     
+      
+       
+         
+END_PROGRAM
+
+
+CONFIGURATION Config0
+
+  RESOURCE Res0 ON PLC
+    VAR_GLOBAL
+      M580S_var : BOOL;
+    END_VAR
+    VAR_GLOBAL RETAIN
+      HYDRO_CMDO_VA_BARRAGE AT %QX100.0 : BOOL;
+      HYDRO_CMDC_VA_BARRAGE AT %QX100.1 : BOOL;
+      HYDRO_ZSO_VA_BARRAGE AT %IX100.0 : BOOL;
+      HYDRO_ZSC_VA_BARRAGE AT %IX100.1 : BOOL;
+      HYDRO_ZT_VA_BARRAGE AT %IW100 : INT;
+      HYDRO_LT_EAU_BARRAGE AT %IW101 : INT;
+      HYDRO_FT_IN_BARRAGE AT %IW102 : INT;
+      HYDRO_FT_VA_BARRAGE AT %IW103 : INT;
+    END_VAR
+    VAR_GLOBAL
+      M580_var : BOOL;
+    END_VAR
+    VAR_GLOBAL RETAIN
+      HYDRO_ST_TURB AT %IW112 : INT;
+      HYDRO_VT_ALTERN AT %IW113 : INT;
+      HYDRO_FQT_ALTERN AT %IW114 : INT;
+      HYDRO_FT_VA_TETE AT %IW104 : INT;
+      HYDRO_JT_ALTERN AT %IW110 : INT;
+    END_VAR
+    VAR_GLOBAL
+      HYDRO_FSP_EAU : INT;
+    END_VAR
+    VAR_GLOBAL RETAIN
+      HYDRO_VSP_ALTERN AT %QW102 : INT;
+      HYD_ZT_VA_RGN AT %QW101 : INT;
+      HYDRO_ZSO_VA_TETE AT %IX100.4 : BOOL;
+      HYDRO_ZSC_VA_TETE AT %IX100.5 : BOOL;
+      HYDRO_ZSO_VA_PIED AT %IX100.6 : BOOL;
+      HYDRO_ZSC_VA_PIED AT %IX100.7 : BOOL;
+      HYDRO_CMDO_VA_TETE AT %QX100.4 : BOOL;
+      HYDRO_CMDC_VA_TETE AT %QX100.5 : BOOL;
+      HYDRO_CMDO_VA_PIED AT %QX100.6 : BOOL;
+      HYDRO_CMDC_VA_PIED AT %QX100.7 : BOOL;
+      HYDRO_AUTORIZ_CPL AT %IX101.0 : BOOL;
+      HYDRO_DEF_DE AT %IX101.1 : BOOL;
+      HYDRO_DEF_DB AT %IX101.2 : BOOL;
+      HYDRO_DEF_DH AT %IX101.3 : BOOL;
+      HYDRO_DEF_DVT AT %IX101.4 : BOOL;
+      HYDRO_CMD_COUPLAGE AT %QX101.0 : BOOL;
+      HYDRO_SIM_DISJ AT %QX101.1 : BOOL;
+      BP_CMDO_DISJ AT %QX12.1 : BOOL;
+      M340 : BOOL;
+      HYDRO_TT_HUILE AT %IW105 : INT;
+      HYDRO_ST_PO_EAU AT %IW106 : INT;
+      HYDRO_FT_EAU_REFR AT %IW107 : INT;
+      HYDRO_TT_EAU AT %IW108 : INT;
+      HYDRO_TT_ECHAUFF AT %IW109 : INT;
+      HYDRO_TT_EAU_REFR AT %IW111 : INT;
+      HYDRO_SSP_PO_EAU AT %QW100 : INT;
+      HYDRO_RM_PO_HUILE AT %IX100.2 : BOOL;
+      HYDRO_RM_PO_EAU AT %IX100.3 : BOOL;
+      HYDRO_CMD_PO_HUILE AT %QX100.2 : BOOL;
+      HYDRO_CMD_PO_EAU AT %QX100.3 : BOOL;
+      BP_ENABLE_Production AT %QX11.0 : BOOL;
+      IHM_Consigne_Puissance AT %QW19 : INT := 1000;
+      SEPAM : BOOL;
+      HYDRO_FREQ AT %IW115 : INT;
+      HYDRO_COURANT1 AT %IW116 : INT;
+      HYDRO_COURANT2 AT %IW117 : INT;
+      HYDRO_COURANT3 AT %IW118 : INT;
+    END_VAR
+    TASK taskHydro(INTERVAL := T#20ms,PRIORITY := 1);
+    TASK taskHydroTransfert(INTERVAL := T#20ms,PRIORITY := 0);
+    PROGRAM instanceHydro WITH taskHydro : hydro;
+    PROGRAM instanceTransfert WITH taskHydroTransfert : Transfert_variable_hydro;
+  END_RESOURCE
+END_CONFIGURATION

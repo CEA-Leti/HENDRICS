@@ -1,0 +1,305 @@
+# Copyright (C) 2025 CEA - All Rights Reserved
+# 
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>.
+
+[environment]
+    factor = 0.5
+
+[variables]
+    #########################################################
+    #   PLC Output / Simulator Inputs                      #
+    #########################################################
+
+    [variables.HYDRO_CMDO_VA_BARRAGE]
+        modbusSlave = 1
+        ioType = "DIGITAL_INPUT"
+        modbusAddress = 0x00
+        value = false
+
+    [variables.HYDRO_CMDC_VA_BARRAGE]
+        modbusSlave = 1
+        ioType = "DIGITAL_INPUT"
+        modbusAddress = 0x01
+        value = false
+
+    [variables.HYDRO_CMD_PO_HUILE]
+        modbusSlave = 1
+        ioType = "DIGITAL_INPUT"
+        modbusAddress = 0x02
+        value = false
+
+    [variables.HYDRO_CMD_PO_EAU]
+        modbusSlave = 1
+        ioType = "DIGITAL_INPUT"
+        modbusAddress = 0x03
+        value = false
+
+    [variables.HYDRO_CMDO_VA_TETE]
+        modbusSlave = 1
+        ioType = "DIGITAL_INPUT"
+        modbusAddress = 0x04
+        value = false
+
+    [variables.HYDRO_CMDC_VA_TETE]
+        modbusSlave = 1
+        ioType = "DIGITAL_INPUT"
+        modbusAddress = 0x05
+        value = false
+
+    [variables.HYDRO_CMDO_VA_PIED]
+        modbusSlave = 1
+        ioType = "DIGITAL_INPUT"
+        modbusAddress = 0x06
+        value = false
+
+    [variables.HYDRO_CMDC_VA_PIED]
+        modbusSlave = 1
+        ioType = "DIGITAL_INPUT"
+        modbusAddress = 0x07 
+        value = false
+
+    [variables.HYDRO_CMD_COUPLAGE]
+        modbusSlave = 1
+        ioType = "DIGITAL_INPUT"
+        modbusAddress = 0x08
+        value = false
+
+    [variables.HYDRO_SIM_DISJ]
+        modbusSlave = 1
+        ioType = "DIGITAL_INPUT"
+        modbusAddress = 0x09
+        value = false
+
+    [variables.HYDRO_SSP_PO_EAU]
+        modbusSlave = 1
+        ioType = "ANALOG_INPUT"
+        modbusAddress = 0x00
+        value = 0.0
+
+    [variables.HYDRO_ZT_VA_RGN]
+        modbusSlave = 1
+        ioType = "ANALOG_INPUT"
+        modbusAddress =  0x01
+        value = 0.0
+
+    [variables.HYDRO_VSP_ALTERN]
+        modbusSlave = 1
+        ioType = "ANALOG_INPUT"
+        modbusAddress = 0x02
+        value = 0.0
+
+    #########################################################
+    #   PLC Inputs / Simulator Outputs                      #
+    #########################################################
+
+    [variables.HYDRO_ZSO_VA_BARRAGE]
+        modbusSlave = 1
+        ioType = "DIGITAL_OUTPUT"
+        modbusAddress =  0x0A
+        value = false
+
+    [variables.HYDRO_ZSC_VA_BARRAGE]
+        modbusSlave = 1
+        ioType = "DIGITAL_OUTPUT"
+        modbusAddress = 0x0B
+        value = false
+
+    [variables.HYDRO_RM_PO_HUILE]
+        modbusSlave = 1
+        ioType = "DIGITAL_OUTPUT"
+        modbusAddress = 0x0C
+        value = false
+
+    [variables.HYDRO_RM_PO_EAU]
+        modbusSlave = 1
+        ioType = "DIGITAL_OUTPUT"
+        modbusAddress = 0x0D
+        value = false
+
+    [variables.HYDRO_ZSO_VA_TETE]
+        modbusSlave = 1
+        ioType = "DIGITAL_OUTPUT"
+        modbusAddress =  0x0E
+        value = false
+
+    [variables.HYDRO_ZSC_VA_TETE]
+        modbusSlave = 1
+        ioType = "DIGITAL_OUTPUT"
+        modbusAddress = 0x0F
+        value = true
+
+    [variables.HYDRO_ZSO_VA_PIED]
+        modbusSlave = 1
+        ioType = "DIGITAL_OUTPUT"
+        modbusAddress = 0x10
+        value = false
+
+    [variables.HYDRO_ZSC_VA_PIED]
+        modbusSlave = 1
+        ioType = "DIGITAL_OUTPUT"
+        modbusAddress = 0x11
+        value = true
+
+    [variables.HYDRO_AUTORIZ_CPL]
+        modbusSlave = 1
+        ioType = "DIGITAL_OUTPUT"
+        modbusAddress = 0x12
+        value = false
+
+    [variables.HYDRO_DEF_DE]
+        modbusSlave = 1
+        ioType = "DIGITAL_OUTPUT"
+        modbusAddress = 0x13
+        value = false
+
+    [variables.HYDRO_DEF_DB]
+        modbusSlave = 1
+        ioType = "DIGITAL_OUTPUT"
+        modbusAddress = 0x14
+        value = false
+
+    [variables.HYDRO_DEF_DH]
+        modbusSlave = 1
+        ioType = "DIGITAL_OUTPUT"
+        modbusAddress = 0x15
+        value = false
+
+    [variables.HYDRO_DEF_DVT]
+        modbusSlave = 1
+        ioType = "DIGITAL_OUTPUT"
+        modbusAddress = 0x16
+        value = false
+
+    [variables.HYDRO_ZT_VA_BARRAGE]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x04
+        value = 0.0
+
+    [variables.HYDRO_LT_EAU_BARRAGE]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x05
+        value = 7.0
+
+    [variables.HYDRO_FT_IN_BARRAGE]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x06
+        value = 76.0 # 76 m3/s   
+
+    [variables.HYDRO_FT_VA_BARRAGE]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x07
+        value = 0.0
+
+    [variables.HYDRO_FT_VA_TETE]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x08
+        value = 0.0
+
+    [variables.HYDRO_TT_HUILE]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x09
+        value = 20.0
+
+    [variables.HYDRO_ST_PO_EAU]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x0A
+        value = 5.0
+
+    [variables.HYDRO_FT_EAU_REFR]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x0B
+        value = 0.0
+
+    [variables.HYDRO_TT_EAU]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x0C
+        value = 10.0
+
+    [variables.HYDRO_TT_ECHAUFF]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x0D
+        value = 10.0
+
+    [variables.HYDRO_JT_ALTERN]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x0E
+        value = 0.0
+
+    [variables.HYDRO_TT_EAU_REFR]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x0F
+        value = 10.0
+
+    [variables.HYDRO_ST_TURB]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x10
+        value = 0.0
+
+    [variables.HYDRO_VT_ALTERN]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x11
+        value = 0.0
+
+    [variables.HYDRO_FQT_ALTERN]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x12
+        value = 0.0
+
+    [variables.HYDRO_FREQ]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x13
+        value = 0
+
+    [variables.HYDRO_COURANT1]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x14
+        value = 0
+
+    [variables.HYDRO_COURANT2]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x15
+        value = 0
+        hide = true
+
+    [variables.HYDRO_COURANT3]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x16
+        value = 0
+        hide = true
+
+    [variables.HYDRO_SHIFT]
+        modbusSlave = 1
+        ioType = "ANALOG_OUTPUT"
+        modbusAddress = 0x17
+        value = 511
+        hide = true
+    

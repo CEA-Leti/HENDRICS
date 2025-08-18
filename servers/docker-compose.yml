@@ -1,0 +1,85 @@
+# Copyright (C) 2025 CEA - All Rights Reserved
+# 
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>.
+
+services:
+
+  grafana:
+    image: "grafana/grafana-oss"
+    container_name: grafana_w_compose
+    user : '0'
+    environment:
+     - GF_SECURITY_ADMIN_USER=admin
+     - GF_SECURITY_ADMIN_PASSWORD=admin
+    ports:
+      - "3002:3000"
+    volumes:
+      - './grafana/varlib:/var/lib/grafana'
+      - './grafana/etc:/etc/grafana'
+    networks:
+      docker_net:
+        ipv4_address: 172.16.240.10
+
+  mosquitto:
+    image: "eclipse-mosquitto:2"
+    volumes:
+      - './mosquitto/config/:/mosquitto/config/'
+      - './mosquitto/log/:/mosquitto/log/'
+      - './mosquitto/data/:/mosquitto/data'
+    ports:
+      - "1885:1883"
+    networks:
+      docker_net:
+        ipv4_address: 172.16.240.13
+
+  node-red:
+    image: custom-node-red 
+    environment:
+      - TZ=Europe/Amsterdam
+    ports:
+      - "1882:1880"
+    networks:
+      docker_net:
+        ipv4_address: 172.16.240.12
+    volumes:
+      - ./node-red/data:/data
+
+  influxdb:
+    image: "influxdb:2.0.7"
+    container_name: influxDB_w_compose
+    user : '0'
+    environment:
+      - INFLUXDB_DB=sec
+      - INFLUXDB_ADMIN_USER=adminadmin
+      - INFLUXDB_ADMIN_PASSWORD=adminadmin
+    ports:
+      - "8088:8086"
+    volumes:
+      - './influx/influxdb2:/var/lib/influxdb2'
+      - './influx/config.yml:/etc/influxdb2/config.yml'
+    networks:
+      docker_net:
+        ipv4_address: 172.16.240.11
+        
+
+networks:
+  docker_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.240.0/24
+
+
+volumes:
+  data:
+    name: "mqtt-broker-data"

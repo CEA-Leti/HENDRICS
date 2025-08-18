@@ -1,0 +1,2 @@
+source "$BR2_EXTERNAL_EDEVICE_PATH/package/python-flask-redis/Config.in"
+source "$BR2_EXTERNAL_EDEVICE_PATH/package/python-flask-socketio/Config.in"

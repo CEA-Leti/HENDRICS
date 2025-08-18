@@ -1,0 +1,35 @@
+# Files to be ignored in embedded-device
+embedded-device/buildroot/
+embedded-device/OpenPLC_v3/
+embedded-device/embedded-device-app/
+
+embedded-device/scripts_config/2023-10-10-raspios-bookworm-armhf.img
+embedded-device/scripts_config/2023-10-10-raspios-bookworm-armhf.img.xz
+
+# Files to be ignored in servers
+servers/grafana/varlib/
+!servers/grafana/varlib/grafana.db
+
+servers/influx/influxdb2/engine/
+
+servers/mosquitto/log/
+
+servers/node-red/data/.npm/
+
+# Files to be ignored in attacks
+attacks/Boopkit/boopkit_src/
+
+attacks/exfiltration_DNS/dnsteal/
+attacks/exfiltration_DNS/recieved_*
+
+attacks/exfiltration_ICMP/exfiltrated_file.txt
+
+attacks/Mirai_malware/mirai_setup/compilMirai/Mirai-Source-Code/
+attacks/Mirai_malware/mirai_setup/arm-buildroot-linux-gnueabihf_sdk-buildroot/
+attacks/Mirai_malware/mirai_setup/VictimWebServer/__pycache__/
+
+attacks/Redis_global_attack/rsa_key/
+
+attacks/SSH_AiTM/ssh-mitm/
+
+attacks/tmp_attack_output.json

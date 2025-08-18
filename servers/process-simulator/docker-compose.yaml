@@ -1,0 +1,69 @@
+# Copyright (C) 2025 CEA - All Rights Reserved
+# 
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+# 
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>.
+
+version: "3.1"
+
+services:
+    modbus:
+        image: seciiot/modbus:amd64
+        container_name: modbus
+        ports:
+            - "5020:5020"
+        networks:
+            - simulatorNetwork
+        command: "--toml /opt/process-simulator/scenarios/hydro/config.toml --slaves 1"
+            
+    redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        container_name: redis
+        networks:
+            - simulatorNetwork
+        logging:
+            driver: none
+
+    simulator:
+        image: seciiot/hydro:amd64
+        container_name: simulator
+        tty: true
+        networks:
+            - simulatorNetwork
+
+    fuxa:
+        image: frangoteam/fuxa:1.2.3
+        container_name: fuxa
+        ports:
+            - "1881:1881"
+        networks:
+            - fuxaNetwork
+            
+    simulator_manager:
+        # HTTP server providing remote control endpoints for managing attack-related services
+        build:
+            context: ./attack_utilities
+            dockerfile: Dockerfile
+        container_name: remote_control_server
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+            - "9000:9000"
+
+
+networks:
+    simulatorNetwork:
+        driver: bridge
+        
+    fuxaNetwork:
+        driver: bridge

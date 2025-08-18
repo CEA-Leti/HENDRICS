@@ -1,0 +1,84 @@
+<!--
+Copyright (C) 2025 CEA - All Rights Reserved
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Redis data Backup</title>
+	<script src="{{url_for('static', filename='socket.io.js')}}"></script>
+	<style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        #backupButton {
+            display: block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #backupButton:hover {
+            background-color: #0056b3;
+        }
+
+        #status {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Redis Data Backup</h1>
+    <p>Click the button below to perform a backup of Redis data :</p>
+    <form id="backupForm" action="/performBackup" method="post">
+        <button id="backupButton" type="submit">Perform Backup</button>
+		<p id = "status"></p>
+    </form>
+
+	<script>
+        // Function called when the button is clicked
+        function backupData() {
+            // Perform backup operations here
+            document.getElementById("status").textContent = "please wait ..."
+        }
+
+        // Link the backup function to the button click
+        document.getElementById("backupButton").addEventListener("click", backupData);
+    </script>
+
+</body>
+</html>

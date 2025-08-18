@@ -1,0 +1,8 @@
+menu "python-flask-socketio"  
+
+config BR2_PACKAGE_PYTHON_FLASK_SOCKETIO
+	bool "python-flask-socketio"
+	help
+	  A nice way to use Redis in your Flask app.
+endmenu
+

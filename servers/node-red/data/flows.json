@@ -1,0 +1,368 @@
+[
+    {
+        "id": "0cf0e4f0a23ba78d",
+        "type": "tab",
+        "label": "Flux 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "2ed11bb172c9aabf",
+        "type": "tab",
+        "label": "Sensor_data_display",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "232fc01437eccee3",
+        "type": "mqtt-broker",
+        "name": "mqtt_broker",
+        "broker": "172.16.240.13",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "a4f3085101b8a855",
+        "type": "influxdb",
+        "hostname": "172.16.238.11",
+        "port": "8086",
+        "protocol": "http",
+        "database": "Sensor-data",
+        "name": "Influx",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://172.16.240.11:8086",
+        "rejectUnauthorized": true
+    },
+    {
+        "id": "1649d737553e8415",
+        "type": "ui_tab",
+        "name": "Detailled data",
+        "icon": "short_text",
+        "order": 3
+    },
+    {
+        "id": "bf4fd142c9d07199",
+        "type": "ui_tab",
+        "name": "Overview",
+        "icon": "show_chart",
+        "order": 2
+    },
+    {
+        "id": "7edc06e41dfe32b0",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "24a0ae9a75108e24",
+        "type": "mqtt in",
+        "z": "2ed11bb172c9aabf",
+        "name": "Humidity",
+        "topic": "humidity",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "232fc01437eccee3",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 100,
+        "y": 680,
+        "wires": [
+            [
+                "c7e811c4d8abe448"
+            ]
+        ]
+    },
+    {
+        "id": "d1bc75e007e743f1",
+        "type": "mqtt in",
+        "z": "2ed11bb172c9aabf",
+        "name": "Temperature",
+        "topic": "temperature",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "232fc01437eccee3",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 110,
+        "y": 600,
+        "wires": [
+            [
+                "d0a23885f4205ca8"
+            ]
+        ]
+    },
+    {
+        "id": "b1e3ba67a328e370",
+        "type": "mqtt in",
+        "z": "2ed11bb172c9aabf",
+        "name": "Pressure",
+        "topic": "pressure",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "232fc01437eccee3",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 100,
+        "y": 760,
+        "wires": [
+            [
+                "2244bc67a9f22f44"
+            ]
+        ]
+    },
+    {
+        "id": "97e732c341d84ca6",
+        "type": "influxdb out",
+        "z": "2ed11bb172c9aabf",
+        "influxdb": "a4f3085101b8a855",
+        "name": "Temperature Influx",
+        "measurement": "Temperature",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "cea.org",
+        "bucket": "sec",
+        "x": 670,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "d0a23885f4205ca8",
+        "type": "change",
+        "z": "2ed11bb172c9aabf",
+        "name": "prepare fields",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t   \"float\": msg.payload.temperature\t}",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 600,
+        "wires": [
+            [
+                "97e732c341d84ca6"
+            ]
+        ]
+    },
+    {
+        "id": "c7e811c4d8abe448",
+        "type": "change",
+        "z": "2ed11bb172c9aabf",
+        "name": "prepare fields",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t   \"float\": msg.payload.humidity\t}",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 680,
+        "wires": [
+            [
+                "f1cea65247beb70c"
+            ]
+        ]
+    },
+    {
+        "id": "f1cea65247beb70c",
+        "type": "influxdb out",
+        "z": "2ed11bb172c9aabf",
+        "influxdb": "a4f3085101b8a855",
+        "name": "Humidity Influx",
+        "measurement": "Humidity",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "cea.org",
+        "bucket": "sec",
+        "x": 660,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "170a1b35e633cca9",
+        "type": "influxdb out",
+        "z": "2ed11bb172c9aabf",
+        "influxdb": "a4f3085101b8a855",
+        "name": "Pressure Influx",
+        "measurement": "Pressure",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "cea.org",
+        "bucket": "sec",
+        "x": 660,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "2244bc67a9f22f44",
+        "type": "change",
+        "z": "2ed11bb172c9aabf",
+        "name": "prepare fields",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "{\t   \"float\": msg.payload.pressure\t}",
+                "tot": "jsonata"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 400,
+        "y": 760,
+        "wires": [
+            [
+                "170a1b35e633cca9"
+            ]
+        ]
+    }
+]
